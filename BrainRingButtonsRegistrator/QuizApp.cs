@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
-
+using System.Threading.Tasks;
 
 namespace BrainRingButtonsRegistrator
 {
@@ -13,6 +13,8 @@ namespace BrainRingButtonsRegistrator
         private const int MaxCandidates = 3;
         private List<int> _candidates;
         private Action<List<int>, bool, string> _updateLabels;
+
+        public event EventHandler Pause;
 
         public QuizApp(string portName, int baudRate, Action<List<int>, bool, string> updateLabels)
         {
@@ -58,6 +60,37 @@ namespace BrainRingButtonsRegistrator
                 }
             }
         }
+        private void ProcessReceivedData(string receivedData)
+        {
+            if (string.IsNullOrEmpty(receivedData))
+            {
+                return;
+            }
+
+            char firstChar = receivedData[0];
+            if (firstChar == 'E') // Обработка ошибки
+            {
+                Console.WriteLine("Error occurred.");
+                _updateLabels(null, true, receivedData);
+            }
+            else if (char.IsDigit(firstChar))
+            {
+                int teamNumber = int.Parse(receivedData.Substring(0, 1));
+                if (teamNumber >= 1 && teamNumber <= 8) // Обработка номера команды
+                {
+                    _candidates.Add(teamNumber);
+                    Console.WriteLine($"Team {teamNumber} is ready to answer! (Rank: {_candidates.Count})");
+
+                    if (_candidates.Count == MaxCandidates)
+                    {
+                        Console.WriteLine("All candidates registered. Please proceed.");
+                    }
+
+                    _updateLabels(_candidates, false, receivedData);
+                }
+            }
+        }
+
 
 
         public void Reset()
@@ -69,11 +102,49 @@ namespace BrainRingButtonsRegistrator
             }
         }
 
-        public void Start()
+        public bool Start()
+        {
+            try
+            {
+                if (!_serialPort.IsOpen)
+                {
+                    _serialPort.Open();                    
+                }
+            }
+            catch(Exception ex)
+            {
+                _updateLabels(null, true, ex.Message);
+                return false;
+            }
+            return true;
+        }
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (!_serialPort.IsOpen)
             {
                 _serialPort.Open();
+            }
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    string receivedData = _serialPort.ReadLine();
+                    ProcessReceivedData(receivedData);
+
+                    if (receivedData.StartsWith("1")) // Первая команда отправила сигнал
+                    {
+                        Pause?.Invoke(this, EventArgs.Empty);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _updateLabels(null, true, ex.Message);
+                }
             }
         }
 

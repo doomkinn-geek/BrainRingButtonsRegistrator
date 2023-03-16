@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Media;
 using System.IO;
+using System.Configuration;
+using System.Threading;
 
 namespace BrainRingButtonsRegistrator
 {
@@ -26,19 +28,28 @@ namespace BrainRingButtonsRegistrator
         private QuizApp _quizApp;
         private DispatcherTimer _timer;
         private DispatcherTimer _countdownTimer;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public MainWindow()
         {
             InitializeComponent();
             stopButton.IsEnabled = false;
+            continueButton.IsEnabled = false;
         }
 
-        private void StartButton_ClickAsync(object sender, RoutedEventArgs e)
+        private async void StartButton_ClickAsync(object sender, RoutedEventArgs e)
         {
-            string portName = "COM5"; 
-            int baudRate = 19200;
+            string portName = ConfigurationManager.AppSettings["PortName"];
+            int baudRate = int.Parse(ConfigurationManager.AppSettings["BaudRate"]);
             _quizApp = new QuizApp(portName, baudRate, UpdateTeamLabels);
-            _quizApp.Start();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _quizApp.Pause += QuizApp_Pause;
+
+            /*if (!_quizApp.Start())
+            {
+                return;
+            }*/
+            await _quizApp.StartAsync(_cancellationTokenSource.Token);
             _quizApp.Reset();
 
             team1Label.Text = "";
@@ -56,11 +67,15 @@ namespace BrainRingButtonsRegistrator
             startButton.IsEnabled = false;
             stopButton.IsEnabled = true;
             StartCountdown(int.Parse(timerTextBox.Text));
-            PlaySound();            
+            PlaySound("start_sound.wav");            
         }
-        private async Task PlaySound()
+        private void QuizApp_Pause(object sender, EventArgs e)
         {
-            string soundFilePath = "start_sound.wav";
+            PauseTimerAndPlaySound();
+        }
+        private async Task PlaySound(string soundFilePath)
+        {
+            //string soundFilePath = "start_sound.wav";
             if(File.Exists(soundFilePath))
     {
                 await Task.Run(() =>
@@ -74,7 +89,7 @@ namespace BrainRingButtonsRegistrator
             }
             else
             {
-                receivedDataTextBox.Text = $"Sound file not found: {soundFilePath}";
+                receivedDataTextBox.Text = $"Звуковой файл не найден: {soundFilePath}";
             }
         }
         
@@ -105,11 +120,9 @@ namespace BrainRingButtonsRegistrator
 
         private void StopButton_ClickAsync(object sender, RoutedEventArgs e)
         {
-            _quizApp.Reset();            
-            _quizApp.Stop();
-            _timer?.Stop();
+            _cancellationTokenSource.Cancel();            
             _countdownTimer?.Stop();
-            PlaySound();
+            PlaySound("stop_sound.wav");
 
             startButton.IsEnabled = true;
             stopButton.IsEnabled = false;
@@ -142,6 +155,12 @@ namespace BrainRingButtonsRegistrator
                         if (candidates.Count > 0)
                         {
                             team1Label.Text = $"{candidates[0]}";
+                            //PlaySound("stop_sound.wav");
+                            //continueButton.IsEnabled = true;
+                            //_countdownTimer?.Stop();    
+                            //_quizApp.Stop();
+                            //stopButton.IsEnabled = false;
+                            //startButton.IsEnabled = true;
                         }
 
                         if (candidates.Count > 1)
@@ -158,6 +177,16 @@ namespace BrainRingButtonsRegistrator
                 receivedDataTextBox.AppendText(receivedData);
                 receivedDataTextBox.ScrollToEnd();
             });
-        }        
+        }
+        private void PauseTimerAndPlaySound()
+        {
+            _countdownTimer.Stop();
+            PlaySound("stop_sound.wav");
+        }
+
+        private void continueButton_Click(object sender, RoutedEventArgs e)
+        {
+            PauseTimerAndPlaySound();
+        }
     }
 }
