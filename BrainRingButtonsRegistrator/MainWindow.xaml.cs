@@ -45,11 +45,11 @@ namespace BrainRingButtonsRegistrator
             _cancellationTokenSource = new CancellationTokenSource();
             _quizApp.Pause += QuizApp_Pause;
 
-            /*if (!_quizApp.Start())
+            if (!_quizApp.Start())
             {
                 return;
-            }*/
-            await _quizApp.StartAsync(_cancellationTokenSource.Token);
+            }
+            //await _quizApp.StartAsync(_cancellationTokenSource.Token);
             _quizApp.Reset();
 
             team1Label.Text = "";

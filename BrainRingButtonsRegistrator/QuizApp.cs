@@ -13,6 +13,7 @@ namespace BrainRingButtonsRegistrator
         private const int MaxCandidates = 3;
         private List<int> _candidates;
         private Action<List<int>, bool, string> _updateLabels;
+        private bool _paused;
 
         public event EventHandler Pause;
 
@@ -24,7 +25,7 @@ namespace BrainRingButtonsRegistrator
             _updateLabels = updateLabels;
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        /*private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             int bytesToRead = _serialPort.BytesToRead;
             byte[] buffer = new byte[bytesToRead];
@@ -59,7 +60,26 @@ namespace BrainRingButtonsRegistrator
                     }
                 }
             }
+        }*/
+
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (_paused)
+            {
+                return;
+            }
+
+            string receivedData = _serialPort.ReadLine();
+            ProcessReceivedData(receivedData);
+
+            if (receivedData.StartsWith("1")) // Первая команда отправила сигнал
+            {
+                Pause?.Invoke(this, EventArgs.Empty);
+                _paused = true;
+            }
         }
+
+
         private void ProcessReceivedData(string receivedData)
         {
             if (string.IsNullOrEmpty(receivedData))
@@ -118,7 +138,7 @@ namespace BrainRingButtonsRegistrator
             }
             return true;
         }
-        public async Task StartAsync(CancellationToken cancellationToken)
+        /*public async Task StartAsync(CancellationToken cancellationToken)
         {
             if (!_serialPort.IsOpen)
             {
@@ -129,7 +149,7 @@ namespace BrainRingButtonsRegistrator
             {
                 try
                 {
-                    string receivedData = _serialPort.ReadLine();
+                    string receivedData = await Task.Run(() => _serialPort.ReadLine(), cancellationToken);
                     ProcessReceivedData(receivedData);
 
                     if (receivedData.StartsWith("1")) // Первая команда отправила сигнал
@@ -146,7 +166,7 @@ namespace BrainRingButtonsRegistrator
                     _updateLabels(null, true, ex.Message);
                 }
             }
-        }
+        }*/
 
         public void Stop()
         {
