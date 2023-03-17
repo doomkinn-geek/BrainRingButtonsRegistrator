@@ -4,6 +4,7 @@ using System.IO.Ports;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 
 namespace BrainRingButtonsRegistrator
 {
@@ -14,8 +15,10 @@ namespace BrainRingButtonsRegistrator
         private List<int> _candidates;
         private Action<List<int>, bool, string> _updateLabels;
         private bool _paused;
-
+        
+        public bool FalseStartRegistration { get; set; }
         public event EventHandler Pause;
+        public event EventHandler<int> FalseStartRegistered;
 
         public QuizApp(string portName, int baudRate, Action<List<int>, bool, string> updateLabels)
         {
@@ -49,26 +52,33 @@ namespace BrainRingButtonsRegistrator
                     int teamNumber;
                     if (int.TryParse(c.ToString(), out teamNumber) && teamNumber >= 1 && teamNumber <= 8)
                     {
-                        if (_candidates.Count < MaxCandidates && !_candidates.Contains(teamNumber))
+                        if (FalseStartRegistration)
                         {
-                            _candidates.Add(teamNumber);
-                            Console.WriteLine($"Team {teamNumber} is ready to answer! (Rank: {_candidates.Count})");
-
-                            if (_candidates.Count == MaxCandidates)
+                            FalseStartRegistered?.Invoke(this, teamNumber);
+                        }
+                        else
+                        {
+                            if (_candidates.Count < MaxCandidates && !_candidates.Contains(teamNumber))
                             {
-                                Console.WriteLine("All candidates registered. Please proceed.");
+                                _candidates.Add(teamNumber);
+                                Console.WriteLine($"Team {teamNumber} is ready to answer! (Rank: {_candidates.Count})");
+
+                                if (_candidates.Count == MaxCandidates)
+                                {
+                                    Console.WriteLine("All candidates registered. Please proceed.");
+                                }
+                                _updateLabels(_candidates, false, c.ToString());
                             }
-                            _updateLabels(_candidates, false, c.ToString());
                         }
                     }
                 }
             }
-            if (_candidates.Count < MaxCandidates)
+            if (_candidates.Count < MaxCandidates && !FalseStartRegistration)
             {
                 if (!_paused)
                 {
                     Pause?.Invoke(this, EventArgs.Empty);
-                    _paused = true;
+                    //_paused = true;
                 }
             }
         }
@@ -81,12 +91,27 @@ namespace BrainRingButtonsRegistrator
             _paused = false;
         }
 
+        public void CheckFalseStart()
+        {
+            if (_serialPort.IsOpen)
+            {
+                FalseStartRegistration = true;
+                char resetSignal = 'R';
+                _serialPort.Write(new[] { resetSignal }, 0, 1);
+                byte[] buffer = Encoding.ASCII.GetBytes("7");
+                _serialPort.Write(buffer, 0, buffer.Length);
+            }
+        }
+
         public void Reset()
         {
             if (_serialPort.IsOpen)
             {
+                FalseStartRegistration = false;
                 char resetSignal = 'R';
                 _serialPort.Write(new[] { resetSignal }, 0, 1);
+                byte[] buffer = Encoding.ASCII.GetBytes("3");
+                _serialPort.Write(buffer, 0, buffer.Length);
             }
         }
 
