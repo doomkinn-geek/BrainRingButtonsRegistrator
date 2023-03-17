@@ -24,9 +24,13 @@ namespace BrainRingButtonsRegistrator
             _candidates = new List<int>(MaxCandidates);
             _updateLabels = updateLabels;
         }
-
-        /*private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            if (_paused)
+            {
+                return;
+            }
+
             int bytesToRead = _serialPort.BytesToRead;
             byte[] buffer = new byte[bytesToRead];
             _serialPort.Read(buffer, 0, bytesToRead);
@@ -54,64 +58,28 @@ namespace BrainRingButtonsRegistrator
                             {
                                 Console.WriteLine("All candidates registered. Please proceed.");
                             }
-
-                            _updateLabels(_candidates, false, receivedData);
+                            _updateLabels(_candidates, false, c.ToString());
                         }
                     }
                 }
             }
-        }*/
-
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (_paused)
+            if (_candidates.Count < MaxCandidates)
             {
-                return;
-            }
-
-            string receivedData = _serialPort.ReadLine();
-            ProcessReceivedData(receivedData);
-
-            if (receivedData.StartsWith("1")) // Первая команда отправила сигнал
-            {
-                Pause?.Invoke(this, EventArgs.Empty);
-                _paused = true;
-            }
-        }
-
-
-        private void ProcessReceivedData(string receivedData)
-        {
-            if (string.IsNullOrEmpty(receivedData))
-            {
-                return;
-            }
-
-            char firstChar = receivedData[0];
-            if (firstChar == 'E') // Обработка ошибки
-            {
-                Console.WriteLine("Error occurred.");
-                _updateLabels(null, true, receivedData);
-            }
-            else if (char.IsDigit(firstChar))
-            {
-                int teamNumber = int.Parse(receivedData.Substring(0, 1));
-                if (teamNumber >= 1 && teamNumber <= 8) // Обработка номера команды
+                if (!_paused)
                 {
-                    _candidates.Add(teamNumber);
-                    Console.WriteLine($"Team {teamNumber} is ready to answer! (Rank: {_candidates.Count})");
-
-                    if (_candidates.Count == MaxCandidates)
-                    {
-                        Console.WriteLine("All candidates registered. Please proceed.");
-                    }
-
-                    _updateLabels(_candidates, false, receivedData);
+                    Pause?.Invoke(this, EventArgs.Empty);
+                    _paused = true;
                 }
             }
         }
 
+        // ...
 
+
+        public void ContinueReading()
+        {
+            _paused = false;
+        }
 
         public void Reset()
         {
@@ -137,44 +105,22 @@ namespace BrainRingButtonsRegistrator
                 return false;
             }
             return true;
-        }
-        /*public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            if (!_serialPort.IsOpen)
-            {
-                _serialPort.Open();
-            }
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    string receivedData = await Task.Run(() => _serialPort.ReadLine(), cancellationToken);
-                    ProcessReceivedData(receivedData);
-
-                    if (receivedData.StartsWith("1")) // Первая команда отправила сигнал
-                    {
-                        Pause?.Invoke(this, EventArgs.Empty);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _updateLabels(null, true, ex.Message);
-                }
-            }
-        }*/
+        }       
 
         public void Stop()
         {
-            if (_serialPort.IsOpen)
+            try
             {
-                _serialPort.Close();
+                if (_serialPort.IsOpen)
+                {
+                    _serialPort.Close();
+                }
             }
+            catch (Exception ex)
+            {
+                _updateLabels(null, true, ex.Message);
+                return;
+            }            
         }
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿<Window x:Class="BrainRingButtonsRegistrator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Библейский ринг по книге Деяния Апостолов" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Window.Resources>
         <Style x:Key="ButtonStyle" TargetType="Button">
@@ -25,7 +26,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        <Grid Grid.Row="0">
+            <Border x:Name="errorBorder" Visibility="Collapsed" Background="Red" Opacity="0.7" CornerRadius="10">
+                <Viewbox>
+                    <TextBlock x:Name="errorTextBlock" Text="Отпустите все кнопки" Foreground="White" Margin="10" />
+                </Viewbox>
+            </Border>
+        </Grid>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -38,21 +45,26 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="1я:" FontSize="32" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Text="1:" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Viewbox Grid.Row="1" Stretch="Uniform">
-                    <TextBlock x:Name="team1Label" Text="-" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="team1Label" Text=" " FontSize="72" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
                 </Viewbox>
             </Grid>
-
+            
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="2я:" FontSize="32" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Text="2:" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Viewbox Grid.Row="1" Stretch="Uniform">
-                    <TextBlock x:Name="team2Label" Text="-" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="team2Label" Text=" " FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
                 </Viewbox>
+                <Border x:Name="countdownBorder" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10" CornerRadius="5" Margin="5" Background="White" BorderBrush="Black" BorderThickness="2" Visibility="Collapsed">
+                    <Viewbox Stretch="Uniform">
+                        <TextBlock x:Name="countdownTextBlock" FontSize="72" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Viewbox>
+                </Border>
             </Grid>
 
             <Grid Grid.Column="2">
@@ -60,34 +72,29 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="3я:" FontSize="32" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Text="3:" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <Viewbox Grid.Row="1" Stretch="Uniform">
-                    <TextBlock x:Name="team3Label" Text="-" FontSize="48" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="team3Label" Text=" " FontSize="72" FontWeight="Bold" Margin="10" HorizontalAlignment="Center"/>
                 </Viewbox>
             </Grid>
         </Grid>
-
-        <!--<Viewbox Grid.Row="1" Stretch="Uniform">
-            <TextBlock x:Name="countdownTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>
-        </Viewbox>-->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button x:Name="startButton" Content="Старт" Click="StartButton_ClickAsync" Style="{StaticResource ButtonStyle}" Grid.Column="0"/>
             <Button x:Name="continueButton" Content="Продолжить" Style="{StaticResource ButtonStyle}" Grid.Column="1" Click="continueButton_Click"/>
             <Button x:Name="stopButton" Content="Стоп" Click="StopButton_ClickAsync" Style="{StaticResource ButtonStyle}" Grid.Column="2"/>
-            <TextBox x:Name="timerTextBox" Width="60" Text="30" FontSize="18" Margin="10" Grid.Column="3"/>
-            <!--<TextBlock x:Name="countdownTextBlock" HorizontalAlignment="Center" Grid.Column="4" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>-->
-        </Grid>
-        <Border Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Background="White" Padding="10" CornerRadius="5" Margin="5">
-            <TextBlock x:Name="countdownTextBlock" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
+            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <TextBlock Text="Время на ответ:" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="16" FontWeight="Bold" />
+                <xctk:IntegerUpDown x:Name="timerTextBox" HorizontalAlignment="Right" TextAlignment="Center" Width="60" Height="30" Value="30" FontSize="18" Margin="10" Minimum="0" Increment="5" />
+            </StackPanel>
+        </Grid>        
         <Grid Grid.Row="3" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

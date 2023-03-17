@@ -17,6 +17,7 @@ using System.Media;
 using System.IO;
 using System.Configuration;
 using System.Threading;
+using System.Globalization;
 
 namespace BrainRingButtonsRegistrator
 {
@@ -27,8 +28,7 @@ namespace BrainRingButtonsRegistrator
     {
         private QuizApp _quizApp;
         private DispatcherTimer _timer;
-        private DispatcherTimer _countdownTimer;
-        private CancellationTokenSource _cancellationTokenSource;
+        private DispatcherTimer _countdownTimer;                
 
         public MainWindow()
         {
@@ -41,15 +41,13 @@ namespace BrainRingButtonsRegistrator
         {
             string portName = ConfigurationManager.AppSettings["PortName"];
             int baudRate = int.Parse(ConfigurationManager.AppSettings["BaudRate"]);
-            _quizApp = new QuizApp(portName, baudRate, UpdateTeamLabels);
-            _cancellationTokenSource = new CancellationTokenSource();
+            _quizApp = new QuizApp(portName, baudRate, UpdateTeamLabels);            
             _quizApp.Pause += QuizApp_Pause;
 
             if (!_quizApp.Start())
             {
                 return;
             }
-            //await _quizApp.StartAsync(_cancellationTokenSource.Token);
             _quizApp.Reset();
 
             team1Label.Text = "";
@@ -63,26 +61,23 @@ namespace BrainRingButtonsRegistrator
                 _timer.Tick += Timer_Tick;
                 _timer.Start();
             }
-
-            startButton.IsEnabled = false;
-            stopButton.IsEnabled = true;
-            StartCountdown(int.Parse(timerTextBox.Text));
-            PlaySound("start_sound.wav");            
+            
+            OnStart();
+            PlaySound("start_sound.wav");
         }
         private void QuizApp_Pause(object sender, EventArgs e)
         {
-            PauseTimerAndPlaySound();
+            OnPause();
         }
-        private async Task PlaySound(string soundFilePath)
-        {
-            //string soundFilePath = "start_sound.wav";
+        /*private async Task PlaySound(string soundFilePath)
+        {            
             if(File.Exists(soundFilePath))
-    {
+            {
                 await Task.Run(() =>
                 {
                     using (var soundPlayer = new SoundPlayer(soundFilePath))
                     {
-                        soundPlayer.Load();
+                        soundPlayer.LoadAsync();
                         soundPlayer.PlaySync();
                     }
                 });
@@ -91,8 +86,27 @@ namespace BrainRingButtonsRegistrator
             {
                 receivedDataTextBox.Text = $"Звуковой файл не найден: {soundFilePath}";
             }
+        }*/
+        private void PlaySound(string soundFilePath)
+        {
+            if (File.Exists(soundFilePath))
+            {
+                Task.Factory.StartNew(() =>
+                {
+                    using (var soundPlayer = new SoundPlayer(soundFilePath))
+                    {
+                        soundPlayer.Load();
+                        soundPlayer.PlaySync();
+                    }
+                }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
+            else
+            {
+                receivedDataTextBox.Text = $"Звуковой файл не найден: {soundFilePath}";
+            }
         }
-        
+
+
         private void StartCountdown(int seconds)
         {
             countdownTextBlock.Text = seconds.ToString();
@@ -118,49 +132,47 @@ namespace BrainRingButtonsRegistrator
         }
 
 
-        private void StopButton_ClickAsync(object sender, RoutedEventArgs e)
-        {
-            _cancellationTokenSource.Cancel();            
-            _countdownTimer?.Stop();
-            PlaySound("stop_sound.wav");
+        private async void StopButton_ClickAsync(object sender, RoutedEventArgs e)
+        {   
+            _countdownTimer?.Stop();            
+            _timer.Stop();
+            await Task.Run(() => { _quizApp.Stop(); });
 
-            startButton.IsEnabled = true;
-            stopButton.IsEnabled = false;
+            OnStop();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private async void Timer_Tick(object sender, EventArgs e)
         {
-            _quizApp.Stop();
+            await Task.Run(() => { _quizApp.Stop(); });
             _timer.Stop();
 
-            startButton.IsEnabled = true;
-            stopButton.IsEnabled = false;
+            OnStop();
         }
 
         private void UpdateTeamLabels(List<int> candidates, bool error, string receivedData)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(async () =>
             {
                 if (error)
                 {
-                    //MessageBox.Show("Error occurred.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    team1Label.Text = "О";
-                    team2Label.Text = "Ш";
-                    team3Label.Text = "Б";
+                    countdownBorder.Visibility = Visibility.Collapsed;
+                    errorBorder.Visibility = Visibility.Visible;
+
+                    _countdownTimer?.Stop();
+                    startButton.IsEnabled = true;
+                    stopButton.IsEnabled = false;
+                    _timer?.Stop();
+                    await Task.Run(() => { _quizApp.Stop(); });
                 }
                 else
                 {
+                    errorBorder.Visibility = Visibility.Collapsed;
+
                     if (candidates != null)
                     {
                         if (candidates.Count > 0)
                         {
                             team1Label.Text = $"{candidates[0]}";
-                            //PlaySound("stop_sound.wav");
-                            //continueButton.IsEnabled = true;
-                            //_countdownTimer?.Stop();    
-                            //_quizApp.Stop();
-                            //stopButton.IsEnabled = false;
-                            //startButton.IsEnabled = true;
                         }
 
                         if (candidates.Count > 1)
@@ -171,22 +183,117 @@ namespace BrainRingButtonsRegistrator
                         if (candidates.Count > 2)
                         {
                             team3Label.Text = $"{candidates[2]}";
+                            OnAllCandidatesReceived();
                         }
                     }
                 }
+                // Определите максимальную длину строки для receivedDataTextBox
+                int maxLineLength = CalculateMaxLineLength(receivedDataTextBox);
+
                 receivedDataTextBox.AppendText(receivedData);
+                receivedDataTextBox.AppendText(";");
+
+                // Если текущая длина текста превышает максимальную длину строки, очистите receivedDataTextBox
+                if (receivedDataTextBox.Text.Length > maxLineLength)
+                {
+                    receivedDataTextBox.Clear();
+                    receivedDataTextBox.AppendText(receivedData);
+                    receivedDataTextBox.AppendText(";");
+                }
                 receivedDataTextBox.ScrollToEnd();
             });
         }
-        private void PauseTimerAndPlaySound()
+        private int CalculateMaxLineLength(TextBox textBox)
         {
-            _countdownTimer.Stop();
-            PlaySound("stop_sound.wav");
+            var typeface = new Typeface(textBox.FontFamily, textBox.FontStyle, textBox.FontWeight, textBox.FontStretch);
+            var formattedText = new FormattedText(
+                "A",
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                typeface,
+                textBox.FontSize,
+                Brushes.Black,
+                new NumberSubstitution(),
+                1);
+
+            double characterWidth = formattedText.Width;
+            double textBoxWidth = textBox.ActualWidth;
+
+            return (int)Math.Floor(textBoxWidth / characterWidth);
         }
+
 
         private void continueButton_Click(object sender, RoutedEventArgs e)
         {
-            PauseTimerAndPlaySound();
+            _quizApp.ContinueReading();
+            OnContinue();
+            PlaySound("start_sound.wav");
+        }
+
+        private void OnStart()
+        {
+            countdownBorder.Visibility = Visibility.Visible;
+            errorBorder.Visibility = Visibility.Collapsed;
+            startButton.IsEnabled = false;
+            stopButton.IsEnabled = true;
+            continueButton.IsEnabled = false;
+            StartCountdown(int.Parse(timerTextBox.Text));
+        }
+
+        private void OnPause()
+        {
+            Dispatcher.Invoke(async () =>
+            {
+                if (_countdownTimer.IsEnabled)
+                {
+                    _countdownTimer.Stop();
+                    countdownBorder.Visibility = Visibility.Collapsed;
+                    errorBorder.Visibility = Visibility.Collapsed;
+                    continueButton.IsEnabled = true;
+                    PlaySound("stop_sound.wav");
+                }
+            });
+        }
+
+        private void OnStop()
+        {
+            Dispatcher.Invoke(async () =>
+            {
+                countdownBorder.Visibility = Visibility.Collapsed;
+                errorBorder.Visibility = Visibility.Collapsed;                
+                _countdownTimer?.Stop();
+                _timer.Stop();
+                await Task.Run(() => { _quizApp.Stop(); });
+
+                startButton.IsEnabled = true;
+                continueButton.IsEnabled = false;
+                stopButton.IsEnabled = false;
+                team1Label.Text = "";
+                team2Label.Text = "";
+                team3Label.Text = "";
+            });
+        }
+
+        private void OnContinue()
+        {
+            _quizApp.ContinueReading();
+            continueButton.IsEnabled = false;
+            _countdownTimer.Start();
+            countdownBorder.Visibility = Visibility.Visible;
+            errorBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private async void OnAllCandidatesReceived()
+        {                        
+            countdownBorder.Visibility = Visibility.Collapsed;
+            startButton.IsEnabled = true;
+            continueButton.IsEnabled = false;
+            stopButton.IsEnabled = false;
+            _timer.Stop();
+            _countdownTimer.Stop();
+            await Task.Run(() => { _quizApp.Stop(); });
+            PlaySound("stop_sound.wav");
+            //PlaySound("sound_gong.wav");            
         }
     }
 }
