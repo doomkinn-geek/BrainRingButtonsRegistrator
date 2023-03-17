@@ -8,7 +8,11 @@ BRRING PC-to-HW COMMUNICATION PROTOCOL
 
 PC to HW messages
 
-ASCII char	Description
+| ASCII char  | Description |
+| ------------- | ------------- |
+|1	          | MAX registrations for pressed buttons = 1|
+| Content Cell  | Content Cell  |
+	
 R	          Start new round
 1	          MAX registrations for pressed buttons = 1
 2	          MAX registrations for pressed buttons = 2
