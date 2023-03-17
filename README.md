@@ -2,9 +2,8 @@
 
 Программа для захвата нажатых кнопок с устройства, которое передаёт данные по RS-232 порту
 
-Протокол обмена с устройством:
-
-BRRING PC-to-HW COMMUNICATION PROTOCOL
+#Протокол обмена с устройством:
+#BRRING PC-to-HW COMMUNICATION PROTOCOL
 
 PC to HW messages
 
