@@ -10,18 +10,15 @@ PC to HW messages
 
 | ASCII char  | Description |
 | ------------- | ------------- |
+|R	        |  Start new round
 |1	          | MAX registrations for pressed buttons = 1|
-| Content Cell  | Content Cell  |
-	
-R	          Start new round
-1	          MAX registrations for pressed buttons = 1
-2	          MAX registrations for pressed buttons = 2
-3	          MAX registrations for pressed buttons = 3 (default)
-4	          MAX registrations for pressed buttons = 4
-5	          MAX registrations for pressed buttons = 5
-6	          MAX registrations for pressed buttons = 6
-7	          MAX registrations for pressed buttons = 7
-8	          MAX registrations for pressed buttons = 8
+|2|	          MAX registrations for pressed buttons = 2|
+|3|	          MAX registrations for pressed buttons = 3 (default)|
+|4|	          MAX registrations for pressed buttons = 4|
+|5|	          MAX registrations for pressed buttons = 5|
+|6|	          MAX registrations for pressed buttons = 6|
+|7|	          MAX registrations for pressed buttons = 7|
+|8|	          MAX registrations for pressed buttons = 8|
 
 
 PC to HW messages
