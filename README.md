@@ -22,14 +22,15 @@ PC to HW messages
 
 
 PC to HW messages
-ASCII char	Description
-E	          Error: buttons are not released at start of round
-1	          Pressed button 1
-2         	Pressed button 2
-3         	Pressed button 3
-4	          Pressed button 4
-5	          Pressed button 5
-6	          Pressed button 6
-7	          Pressed button 7
-8	          Pressed button 8
+| ASCII char  | Description |
+| ------------- | ------------- |
+|E|	          Error: buttons are not released at start of round|
+|1|	          Pressed button 1|
+|2 |        	Pressed button 2|
+|3  |       	Pressed button 3|
+|4	 |         Pressed button 4|
+|5	  |        Pressed button 5|
+|6	   |       Pressed button 6|
+|7	    |      Pressed button 7|
+|8	     |     Pressed button 8|
 
