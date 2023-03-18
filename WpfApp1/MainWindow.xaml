@@ -9,13 +9,13 @@
             <Button Name="ConnectButton" Content="Connect" Click="ConnectButton_Click" />
             <Button Name="DisconnectButton" Content="Disconnect" Click="DisconnectButton_Click" IsEnabled="False" />
             <Button Name="SendResetButton" Content="Reset" Click="SendResetButton_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox1" Content="Button 1" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox2" Content="Button 2" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox3" Content="Button 3" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox4" Content="Button 4" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox5" Content="Button 5" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox6" Content="Button 6" Click="CheckBox_Click" IsEnabled="False" />
-            <CheckBox Name="CheckBox7" Content="Button 7" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox x:Name="CheckBox1" Content="Button 1" Tag="1" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox2" Content="Button 2" Tag="2" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox3" Content="Button 3" Tag="3" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox4" Content="Button 4" Tag="4" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox5" Content="Button 5" Tag="5" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox6" Content="Button 6" Tag="6" Margin="0,0,0,10" />
+            <CheckBox x:Name="CheckBox7" Content="Button 7" Tag="7" Margin="0,0,0,10" />
         </StackPanel>
     </Grid>
 </Window>
