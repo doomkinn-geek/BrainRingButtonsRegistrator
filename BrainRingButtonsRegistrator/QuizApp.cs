@@ -17,6 +17,10 @@ namespace BrainRingButtonsRegistrator
         private bool _paused;
         
         public bool FalseStartRegistration { get; set; }
+        /// <summary>
+        /// в случае возникновения ошибки, ставим флаг
+        /// </summary>
+        public bool ErrorRegistered { get; set; } = false;
         public event EventHandler CandidateReceived;
         public event EventHandler<int> FalseStartRegistered;
 
@@ -45,10 +49,12 @@ namespace BrainRingButtonsRegistrator
                 if (c == 'E')
                 {
                     Console.WriteLine("Error occurred.");
+                    ErrorRegistered = true;
                     _updateLabels(null, true, receivedData);
                 }
                 else
                 {
+                    ErrorRegistered = false;
                     int teamNumber;
                     if (int.TryParse(c.ToString(), out teamNumber) && teamNumber >= 1 && teamNumber <= 8)
                     {

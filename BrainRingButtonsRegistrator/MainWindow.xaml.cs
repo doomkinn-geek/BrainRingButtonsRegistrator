@@ -93,27 +93,7 @@ namespace BrainRingButtonsRegistrator
             Dispatcher.Invoke(() =>
             {
                 errorBorder.Visibility = Visibility.Collapsed;
-                ShowSquareBlock(teamNumber);
-                /*switch (teamNumber)
-                {
-                    case 1:
-                        squareBlock1.Visibility = Visibility.Visible; break;
-                    case 2:
-                        squareBlock2.Visibility = Visibility.Visible; break;
-                    case 3:
-                        squareBlock3.Visibility = Visibility.Visible; break;
-                    case 4:
-                        squareBlock4.Visibility = Visibility.Visible; break;
-                    case 5:
-                        squareBlock5.Visibility = Visibility.Visible; break;
-                    case 6:
-                        squareBlock6.Visibility = Visibility.Visible; break;
-                    case 7:
-                        squareBlock7.Visibility = Visibility.Visible; break;
-                    default:
-                        break;
-
-                } */
+                ShowSquareBlock(teamNumber);                
             });            
         }
         private void ShowSquareBlock(int blockNumber)
@@ -209,7 +189,7 @@ namespace BrainRingButtonsRegistrator
                     _countdownTimer?.Stop();
                     checkButton.IsEnabled = true;
                     startButton.IsEnabled = false;
-                    stopButton.IsEnabled = false;                    
+                    stopButton.IsEnabled = true;                    
                     await Task.Run(() => { _quizApp.Stop(); });
                 }
                 else
@@ -377,7 +357,15 @@ namespace BrainRingButtonsRegistrator
             }
             _quizApp.CheckFalseStart();
             OnCheckStart();
-            PlaySound("sound_gong.wav");
+            Thread.Sleep(50);
+            if (_quizApp.ErrorRegistered)
+            {
+                PlaySound("error.wav");
+            }
+            else
+            {
+                PlaySound("sound_gong.wav");
+            }            
         }
         private void timerTextBox_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {

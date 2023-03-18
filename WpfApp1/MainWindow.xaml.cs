@@ -102,6 +102,16 @@ namespace DeviceSimulator
             CheckBox6.IsEnabled = isEnabled;
             CheckBox7.IsEnabled = isEnabled;
         }
+        private void SetCheckBoxCheckedState(bool isChecked)
+        {
+            CheckBox1.IsChecked = isChecked;
+            CheckBox2.IsChecked = isChecked;
+            CheckBox3.IsChecked = isChecked;
+            CheckBox4.IsChecked = isChecked;
+            CheckBox5.IsChecked = isChecked;
+            CheckBox6.IsChecked = isChecked;
+            CheckBox7.IsChecked = isChecked;
+        }
 
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -142,6 +152,9 @@ namespace DeviceSimulator
 
         private void SendResetButton_Click(object sender, RoutedEventArgs e)
         {
+            Dispatcher.BeginInvoke(() => SetCheckBoxEnabledState(true));
+            Dispatcher.BeginInvoke(() => SetCheckBoxCheckedState(false));
+
             bool allButtonsReleased = CheckBox1.IsChecked == false &&
             CheckBox2.IsChecked == false &&
             CheckBox3.IsChecked == false &&
