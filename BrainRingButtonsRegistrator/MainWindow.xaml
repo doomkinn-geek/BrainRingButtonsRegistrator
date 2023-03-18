@@ -34,6 +34,14 @@
             </Border>
         </Grid>
         <Grid Grid.Row="0">
+            <Border Name="falseStartBorder" Visibility="Collapsed" Background="Aqua" Opacity="0.7" CornerRadius="10">
+                <Viewbox>
+                    <TextBlock Name="falseStartCandidatesTextBlock" FontSize="48" Text="фальш-стартом: "/>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -84,13 +92,15 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Button x:Name="startButton" Content="Старт" Click="StartButton_ClickAsync" Style="{StaticResource ButtonStyle}" Grid.Column="0"/>
-            <Button x:Name="continueButton" Content="Продолжить" Style="{StaticResource ButtonStyle}" Grid.Column="1" Click="continueButton_Click"/>
-            <Button x:Name="stopButton" Content="Стоп" Click="StopButton_ClickAsync" Style="{StaticResource ButtonStyle}" Grid.Column="2"/>
-            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button x:Name="acceptAnswersButton" Content="Прием ответов" Click="AcceptAnswersButton_Click" Style="{StaticResource ButtonStyle}" Grid.Column="1" Margin="10" />
+            <Button x:Name="continueButton" Content="Продолжить" Style="{StaticResource ButtonStyle}" Grid.Column="2" Click="ContinueButton_Click"/>
+            <Button x:Name="stopButton" Content="Стоп" Click="StopButton_ClickAsync" Style="{StaticResource ButtonStyle}" Grid.Column="3"/>
+            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                 <TextBlock Text="Время на ответ:" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="16" FontWeight="Bold" />
                 <xctk:IntegerUpDown x:Name="timerTextBox" HorizontalAlignment="Right" TextAlignment="Center" Width="60" Height="30" Value="30" FontSize="18" Margin="10" Minimum="0" Increment="5" />
             </StackPanel>
