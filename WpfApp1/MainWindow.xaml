@@ -1,0 +1,21 @@
+﻿<Window x:Class="DeviceSimulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RS-232 Device Simulator" Height="300" Width="400">
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="Available Serial Ports:" />
+            <ComboBox Name="PortList" />
+            <Button Name="ConnectButton" Content="Connect" Click="ConnectButton_Click" />
+            <Button Name="DisconnectButton" Content="Disconnect" Click="DisconnectButton_Click" IsEnabled="False" />
+            <Button Name="SendResetButton" Content="Reset" Click="SendResetButton_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox1" Content="Button 1" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox2" Content="Button 2" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox3" Content="Button 3" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox4" Content="Button 4" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox5" Content="Button 5" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox6" Content="Button 6" Click="CheckBox_Click" IsEnabled="False" />
+            <CheckBox Name="CheckBox7" Content="Button 7" Click="CheckBox_Click" IsEnabled="False" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrainRingButtonsRegistrator", "BrainRingButtonsRegistrator\BrainRingButtonsRegistrator.csproj", "{DBCAD6B0-91AA-4B08-BE68-FB91373FF6F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainRingButtonsRegistrator", "BrainRingButtonsRegistrator\BrainRingButtonsRegistrator.csproj", "{DBCAD6B0-91AA-4B08-BE68-FB91373FF6F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceSimulator", "WpfApp1\DeviceSimulator.csproj", "{F8DC7236-EB91-4852-BB84-AD7929FC9D68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{DBCAD6B0-91AA-4B08-BE68-FB91373FF6F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBCAD6B0-91AA-4B08-BE68-FB91373FF6F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBCAD6B0-91AA-4B08-BE68-FB91373FF6F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8DC7236-EB91-4852-BB84-AD7929FC9D68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8DC7236-EB91-4852-BB84-AD7929FC9D68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8DC7236-EB91-4852-BB84-AD7929FC9D68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8DC7236-EB91-4852-BB84-AD7929FC9D68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
