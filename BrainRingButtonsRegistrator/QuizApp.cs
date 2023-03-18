@@ -17,7 +17,7 @@ namespace BrainRingButtonsRegistrator
         private bool _paused;
         
         public bool FalseStartRegistration { get; set; }
-        public event EventHandler Pause;
+        public event EventHandler CandidateReceived;
         public event EventHandler<int> FalseStartRegistered;
 
         public QuizApp(string portName, int baudRate, Action<List<int>, bool, string> updateLabels)
@@ -77,14 +77,11 @@ namespace BrainRingButtonsRegistrator
             {
                 if (!_paused)
                 {
-                    Pause?.Invoke(this, EventArgs.Empty);
+                    CandidateReceived?.Invoke(this, EventArgs.Empty);
                     //_paused = true;
                 }
             }
         }
-
-        // ...
-
 
         public void ContinueReading()
         {
