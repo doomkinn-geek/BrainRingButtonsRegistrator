@@ -96,7 +96,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" FontSize="70" Text="Фальш старт:"/>
-                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel x:Name="squareBlockContainer" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
                             <Border x:Name="squareBlock1" Visibility="Collapsed" Background="Red" CornerRadius="5" BorderBrush="Black" BorderThickness="2" Margin="2">
                                 <TextBlock Text="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="80" Foreground="White" TextWrapping="Wrap"/>
                             </Border>

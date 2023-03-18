@@ -93,7 +93,8 @@ namespace BrainRingButtonsRegistrator
             Dispatcher.Invoke(() =>
             {
                 errorBorder.Visibility = Visibility.Collapsed;
-                switch (teamNumber)
+                ShowSquareBlock(teamNumber);
+                /*switch (teamNumber)
                 {
                     case 1:
                         squareBlock1.Visibility = Visibility.Visible; break;
@@ -112,9 +113,33 @@ namespace BrainRingButtonsRegistrator
                     default:
                         break;
 
-                }                
+                } */
             });            
-        }       
+        }
+        private void ShowSquareBlock(int blockNumber)
+        {
+            // Получаем соответствующий squareBlock по номеру
+            Border squareBlock = FindName($"squareBlock{blockNumber}") as Border;
+            if (squareBlock != null)
+            {
+                // Делаем его видимым
+                squareBlock.Visibility = Visibility.Visible;
+
+                // Получаем StackPanel
+                StackPanel stackPanel = squareBlockContainer;
+
+                if (stackPanel != null)
+                {
+                    // Удаляем его из текущей позиции в StackPanel и добавляем его в конец
+                    stackPanel.Children.Remove(squareBlock);
+                    stackPanel.Children.Add(squareBlock);
+                }
+            }
+        }
+
+
+
+
         private void PlaySound(string soundFilePath)
         {
             if (File.Exists(soundFilePath))
